@@ -5,6 +5,8 @@ cd $projectDir
 
 rpmDir=rpmbuild
 
+minSupportedVersion=9 # <- This will change over time
+
 if [ "$#" != "1" ] && [ "$#" != "2" ]; then
   echo "USAGE: buildTomcatRPM.sh [-y] <fullVersion>"
   exit 1
@@ -46,7 +48,13 @@ echo "Generating spec file for $fullVersion"
 sed "s/__TOMCAT_VERSION__/$fullVersion/g" ./tomcat.spec.tmpl | sed "s/__TOMCAT_MAJOR_VERSION__/$majorVersion/g" > $rpmDir/SPECS/tomcat-$fullVersion.spec
 
 echo "Downloading Tomcat $fullVersion"
-$(cd $rpmDir/SOURCES && wget https://dlcdn.apache.org/tomcat/tomcat-$majorVersion/v$fullVersion/bin/apache-tomcat-$fullVersion.tar.gz)
+if [ "$majorVersion" -lt "minSupportedVersion" ]; then
+  echo "WARNING: This version of Tomcat is EOL and no longer supported!"
+  downloadUrl=https://archive.apache.org/dist/tomcat/tomcat-$majorVersion/v$fullVersion/bin/apache-tomcat-$fullVersion.tar.gz
+else
+  downloadUrl=https://dlcdn.apache.org/tomcat/tomcat-$majorVersion/v$fullVersion/bin/apache-tomcat-$fullVersion.tar.gz
+fi
+$(cd $rpmDir/SOURCES && wget $downloadUrl)
 
 echo "Building Source RPM"
 rpmbuild --define "_topdir `pwd`/rpmbuild" -bs ./rpmbuild/SPECS/tomcat-$fullVersion.spec
