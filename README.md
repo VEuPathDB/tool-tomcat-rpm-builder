@@ -1,4 +1,4 @@
-# tool-tomcat-rpm-builder
+# Tomcat RPM Build Tool
 Tooling to easily build new Tomcat RPMs as new versions are released.
 
 ## Dependencies
