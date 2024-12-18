@@ -1,5 +1,6 @@
 #!/bin/bash
 
+currentDir=$(pwd)
 projectDir=$(dirname $(realpath $0))
 cd $projectDir
 
@@ -58,8 +59,10 @@ $(cd $rpmDir/SOURCES && wget $downloadUrl)
 
 echo "Building Source RPM"
 rpmbuild --define "_topdir `pwd`/rpmbuild" -bs ./rpmbuild/SPECS/tomcat-$fullVersion.spec
+cp ./rpmbuild/SRPMS/tomcat-$fullVersion-ebrc-1.src.rpm $currentDir
 
 echo "Building Binary RPM"
 rpmbuild --define "_topdir `pwd`/rpmbuild" -bb ./rpmbuild/SPECS/tomcat-$fullVersion.spec
+cp ./rpmbuild/RPMS/*/tomcat-$fullVersion-ebrc-1.x86_64.rpm $currentDir
 
 echo "Done"
