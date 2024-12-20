@@ -1,21 +1,27 @@
 %define debug_package %{nil}
+
 %define dist_version __TOMCAT_VERSION__
-%define dist_download_dir tomcat-__TOMCAT_MAJOR_VERSION__
+%define major_version __TOMCAT_MAJOR_VERSION__
+
+%define dist_download_dir tomcat-%{major_version}
 %define tc_name apache-tomcat-%{dist_version}
+
+%define package_name tomcat-%{major_version}
+%define package_version %{dist_version}
 %define packager Ryan Doherty <rdoherty@upenn.edu>
 
-Summary: Apache Tomcat Core
-Name: tomcat-%{dist_version}
-Version: ebrc
+Summary: Apache Tomcat Server
+Name: %{package_name}
+Version: %{package_version}
 Release: 1
 License: Apache 2.0
 Group: Networking/Daemons
-URL: http://tomcat.apache.org
+URL: https://tomcat.apache.org
 Packager: %{packager}
 
 Requires: java-21-openjdk
 
-Source0: https://dlcdn.apache.org/tomcat/%{dist_download_dir}/v%{dist_version}/bin/%{tc_name}.tar.gz
+Source0: https://archive.apache.org/dist/tomcat/%{dist_download_dir}/v%{dist_version}/bin/%{tc_name}.tar.gz
 
 BuildRoot: %{_tmppath}/%{tc_name}
 
@@ -42,9 +48,9 @@ make
 rm -rf $RPM_BUILD_ROOT
 mkdir -p $RPM_BUILD_ROOT/usr/local
 pwd
-cp -a . $RPM_BUILD_ROOT/usr/local/%{tc_name}
+cp -a . $RPM_BUILD_ROOT/usr/local/%{package_name}
 pwd
-cp bin/commons-daemon-*-native-src/unix/jsvc $RPM_BUILD_ROOT/usr/local/%{tc_name}/bin
+cp bin/commons-daemon-*-native-src/unix/jsvc $RPM_BUILD_ROOT/usr/local/%{package_name}/bin
 
 %post
 cd /usr/local/
@@ -57,7 +63,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-, root, root)
-/usr/local/%{tc_name}
+/usr/local/%{package_name}
 
 %doc
 

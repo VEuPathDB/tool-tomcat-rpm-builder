@@ -1,30 +1,19 @@
 #!/bin/bash
 
-currentDir=$(pwd)
-projectDir=$(dirname $(realpath $0))
-cd $projectDir
-
-rpmDir=rpmbuild
-
+# Minimum version still supported by Apache; this will not effect the
+#   ability to create an RPM but a warning will be printed.
 minSupportedVersion=9 # <- This will change over time
 
+currentDir=$(pwd)
+sourceDir=$(dirname $(realpath $0))
+cd $sourceDir
+
 if [ "$#" != "1" ] && [ "$#" != "2" ]; then
-  echo "USAGE: buildTomcatRPM.sh [-y] <fullVersion>"
+  echo "USAGE: buildTomcatRPM.sh <fullVersion>"
   exit 1
 fi
 
 fullVersion=$1
-confirmOverwrite="true"
-
-if [ "$1" == "-y" ]; then
-  confirmOverwrite="false"
-  fullVersion=$2
-  if [ "$fullVersion" == "" ]; then
-    echo "USAGE: buildTomcatRPM.sh [-y] <fullVersion>"
-    exit 1
-  fi
-fi
-
 majorVersion=$(echo "$fullVersion" | sed -e 's/\([0-9]*\).*/\1/')
 
 if [ "$majorVersion" == "" ] || [ "$majorVersion" == "$fullVersion" ]; then
@@ -32,14 +21,10 @@ if [ "$majorVersion" == "" ] || [ "$majorVersion" == "$fullVersion" ]; then
   exit 1
 fi
 
-echo "Will create RPM for Tomcat $majorVersion, specifically $fullVersion"
+rpmDir=/tmp/rpmbuild-$(openssl rand -hex 12)
 
-if [ -e "$rpmDir" ]; then
-  echo "Existing $rpmDir/ directory (with any previously built RPMs) will be overwritten."
-  if [ "$confirmOverwrite" == "true" ]; then
-    read -p "Continue (y/n)? " confirm && [[ $confirm == [yY] || $confirm == [yY][eE][sS] ]] || exit 1
-  fi
-fi
+echo "Will create RPM for Tomcat $majorVersion, specifically $fullVersion"
+echo "Work dir: $rpmDir"
 
 echo "Creating $rpmDir and subdirs"
 rm -rf $rpmDir
@@ -49,7 +34,7 @@ echo "Generating spec file for $fullVersion"
 sed "s/__TOMCAT_VERSION__/$fullVersion/g" ./tomcat.spec.tmpl | sed "s/__TOMCAT_MAJOR_VERSION__/$majorVersion/g" > $rpmDir/SPECS/tomcat-$fullVersion.spec
 
 echo "Downloading Tomcat $fullVersion"
-if [ "$majorVersion" -lt "minSupportedVersion" ]; then
+if [ "$majorVersion" -lt "$minSupportedVersion" ]; then
   echo "WARNING: This version of Tomcat is EOL and no longer supported!"
   downloadUrl=https://archive.apache.org/dist/tomcat/tomcat-$majorVersion/v$fullVersion/bin/apache-tomcat-$fullVersion.tar.gz
 else
@@ -57,12 +42,9 @@ else
 fi
 $(cd $rpmDir/SOURCES && wget $downloadUrl)
 
-echo "Building Source RPM"
-rpmbuild --define "_topdir `pwd`/rpmbuild" -bs ./rpmbuild/SPECS/tomcat-$fullVersion.spec
-cp ./rpmbuild/SRPMS/tomcat-$fullVersion-ebrc-1.src.rpm $currentDir
-
-echo "Building Binary RPM"
-rpmbuild --define "_topdir `pwd`/rpmbuild" -bb ./rpmbuild/SPECS/tomcat-$fullVersion.spec
-cp ./rpmbuild/RPMS/*/tomcat-$fullVersion-ebrc-1.x86_64.rpm $currentDir
+echo "Building Source and Binary RPMs"
+rpmbuild --define "_topdir $rpmDir" -ba $rpmDir/SPECS/tomcat-$fullVersion.spec
+cp $rpmDir/SRPMS/tomcat-$majorVersion-$fullVersion-1.src.rpm $currentDir
+cp $rpmDir/RPMS/*/tomcat-$majorVersion-$fullVersion-1.x86_64.rpm $currentDir
 
 echo "Done"
