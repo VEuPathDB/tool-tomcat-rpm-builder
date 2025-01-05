@@ -55,7 +55,7 @@ cp bin/commons-daemon-*-native-src/unix/jsvc $RPM_BUILD_ROOT/usr/local/%{package
 %post
 cd /usr/local/
 if [ ! -e apache-tomcat ]; then
-    ln -fs %{tc_name} apache-tomcat
+    ln -fs %{package_name} apache-tomcat
 fi
 
 %clean
