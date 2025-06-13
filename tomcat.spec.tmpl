@@ -48,14 +48,14 @@ make
 rm -rf $RPM_BUILD_ROOT
 mkdir -p $RPM_BUILD_ROOT/usr/local
 pwd
-cp -a . $RPM_BUILD_ROOT/usr/local/%{package_name}
+cp -a . $RPM_BUILD_ROOT/usr/local/%{tc_name}
 pwd
-cp bin/commons-daemon-*-native-src/unix/jsvc $RPM_BUILD_ROOT/usr/local/%{package_name}/bin
+cp bin/commons-daemon-*-native-src/unix/jsvc $RPM_BUILD_ROOT/usr/local/%{tc_name}/bin
 
 %post
 cd /usr/local/
 if [ ! -e apache-tomcat ]; then
-    ln -fs %{package_name} apache-tomcat
+    ln -fs %{tc_name} apache-tomcat
 fi
 
 %clean
@@ -63,7 +63,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-, root, root)
-/usr/local/%{package_name}
+/usr/local/%{tc_name}
 
 %doc
 
