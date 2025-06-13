@@ -44,7 +44,7 @@ $(cd $rpmDir/SOURCES && wget $downloadUrl)
 
 echo "Building Source and Binary RPMs"
 rpmbuild --define "_topdir $rpmDir" -ba $rpmDir/SPECS/tomcat-$fullVersion.spec
-cp $rpmDir/SRPMS/tomcat-$majorVersion-$fullVersion-1.src.rpm $currentDir
-cp $rpmDir/RPMS/*/tomcat-$majorVersion-$fullVersion-1.x86_64.rpm $currentDir
+cp $rpmDir/SRPMS/tomcat-*.src.rpm $currentDir
+cp $rpmDir/RPMS/*/tomcat-*.rpm $currentDir
 
 echo "Done"
