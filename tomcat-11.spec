@@ -60,7 +60,5 @@ cp bin/commons-daemon-*-native-src/unix/jsvc $RPM_BUILD_ROOT/usr/local/apache-to
 %defattr(-, root, root)
 /usr/local/apache-tomcat-%{major_version}
 
-%files -n default-tomcat-%{major_version}
-
 %doc
 
