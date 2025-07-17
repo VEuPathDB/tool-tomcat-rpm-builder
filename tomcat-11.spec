@@ -1,6 +1,6 @@
 %define debug_package %{nil}
 
-%define dist_version 11.0.8
+%define dist_version 11.0.9
 %define major_version 11
 
 %define tc_name apache-tomcat-%{dist_version}
