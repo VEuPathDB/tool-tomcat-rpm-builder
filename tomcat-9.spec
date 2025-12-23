@@ -1,6 +1,6 @@
 %define debug_package %{nil}
 
-%define dist_version 9.0.107
+%define dist_version 9.0.113
 %define major_version 9
 
 %define package_name tomcat-%{major_version}
